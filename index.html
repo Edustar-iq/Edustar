@@ -3,13 +3,58 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#4F46E5" />
     <title>StarEdu - المنصة التعليمية</title>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <div id="root">
+      <div style="display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif; direction:rtl;">
+        جاري تحميل المنصة...
+      </div>
+    </div>
+    <div id="error-display" style="display:none; color:white; background:red; padding:20px; font-family:sans-serif; direction:ltr; text-align:left; position:fixed; top:0; left:0; right:0; z-index:9999;">
+      <h3>Runtime Error Detected:</h3>
+      <pre id="error-message" style="white-space:pre-wrap;"></pre>
+      <button onclick="location.reload()" style="padding:10px; margin-top:10px; cursor:pointer;">Reload Page</button>
+    </div>
+    <script>
+      window.onerror = function(msg, url, line, col, error) {
+        var display = document.getElementById('error-display');
+        var message = document.getElementById('error-message');
+        if (display && message) {
+          display.style.display = 'block';
+          message.textContent = msg + '\nAt: ' + url + ':' + line + ':' + col;
+        }
+        return false;
+      };
+      window.onunhandledrejection = function(event) {
+        if (event.reason && event.reason.toString().includes('WebSocket closed without opened')) {
+          return;
+        }
+        var display = document.getElementById('error-display');
+        var message = document.getElementById('error-message');
+        if (display && message) {
+          display.style.display = 'block';
+          message.textContent = 'Unhandled Rejection: ' + event.reason;
+        }
+      };
+    </script>
+    <script type="module" src="src/main.tsx"></script>
+    <script>
+      // Timeout to detect if the app fails to load
+      setTimeout(function() {
+        var root = document.getElementById('root');
+        if (root && root.innerHTML.includes('جاري تحميل المنصة...')) {
+          var display = document.getElementById('error-display');
+          var message = document.getElementById('error-message');
+          if (display && message) {
+            display.style.display = 'block';
+            message.textContent = 'فشل تحميل التطبيق. قد يكون ذلك بسبب خطأ في الاتصال أو أنك تحاول تشغيل النسخة المصدرية مباشرة من GitHub. يرجى استخدام الرابط المشترك (Shared App URL) أو التأكد من بناء المشروع (build) أولاً.';
+          }
+        }
+      }, 10000);
+    </script>
   </body>
 </html>
 
